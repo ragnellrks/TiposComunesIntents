@@ -3,9 +3,16 @@ package es.riberadeltajo.implicitintents;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import es.riberadeltajo.implicitintents.databinding.ActivityMainBinding;
 
@@ -61,6 +68,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        Intent i = getIntent();
+        String action = i.getAction();
+
+        if(action.equals(Intent.ACTION_SEND)){
+            if(i.getStringExtra(Intent.EXTRA_TEXT) == null){
+                Uri uri = i.getParcelableExtra(Intent.EXTRA_STREAM);
+                if(uri != null) {
+                    InputStream is = null;
+                    try {
+                        is = getContentResolver().openInputStream(uri);
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    binding.imageView.setImageBitmap(BitmapFactory.decodeStream(is));
+                }
+            }else{
+                binding.textView.setText(i.getStringExtra(Intent.EXTRA_TEXT));
+            }
+        }
 
 
     }
